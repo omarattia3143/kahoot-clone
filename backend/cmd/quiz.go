@@ -57,7 +57,8 @@ func websocketTest(c *websocket.Conn) {
 		}
 		log.Printf("recv: %s", msg)
 
-		if err = c.WriteMessage(mt, msg); err != nil {
+		serverMsg := "Server: " + string(msg)
+		if err = c.WriteMessage(mt, []byte(serverMsg)); err != nil {
 			log.Println("write:", err)
 			break
 		}
@@ -65,7 +66,11 @@ func websocketTest(c *websocket.Conn) {
 
 }
 func setupDB() {
-	client, _ = mongo.Connect(options.Client().ApplyURI("mongodb://admin:yourpassword@localhost:27017"))
+	var err error
+	client, err = mongo.Connect(options.Client().ApplyURI("mongodb://admin:yourpassword@localhost:27017"))
+	if err != nil {
+		log.Fatal("can not connect to database")
+	}
 	quizCollection = client.Database("quiz").Collection("quizzes")
 }
 
