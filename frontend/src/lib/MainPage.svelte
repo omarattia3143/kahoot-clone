@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Button from "./Button.svelte";
   import QuizCard from "./QuizCard.svelte";
+  import Button from "./Button.svelte";
 
   let quizzes: { _id: string; name: string }[] = [];
 
@@ -15,19 +15,20 @@
   }
 
   function webSocketConnect() {
-    const ws = new WebSocket("http://localhost:3000/ws");
+    const ws = new WebSocket("ws://localhost:3000/ws");
     ws.onopen = () => {
-      console.log("Connected to WebSocket server");
-      ws.send("Hello from the client!");
+      ws.send("Hello");
     };
     ws.onmessage = (event) => {
-      console.log("Message from server:", event.data);
+      console.log(event.data);
     };
   }
-
-  webSocketConnect();
-  getQuizzes();
 </script>
+
+<div>
+  <Button on:click={getQuizzes}>Get Quizzes</Button>
+  <Button on:click={webSocketConnect}>Connect</Button>
+</div>
 
 {#each quizzes as quiz}
   <QuizCard {quiz}/>
