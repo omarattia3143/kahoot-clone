@@ -9,9 +9,9 @@ type QuizController struct {
 	quizService *service.QuizService
 }
 
-func NewQuizController(quizService *service.QuizService) *QuizController {
+func NewQuizController(q *service.QuizService) *QuizController {
 	return &QuizController{
-		quizService: quizService,
+		quizService: q,
 	}
 }
 

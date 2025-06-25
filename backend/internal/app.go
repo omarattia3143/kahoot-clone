@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"context"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/omarattia3143/quiz/internal/collection"
@@ -24,43 +23,12 @@ type App struct {
 }
 
 func (a *App) Init() {
-
+	a.setupDB()
+	a.setupServices()
+	a.setupHttp()
+	log.Fatal(a.httpServer.Listen(":3000"))
 }
 
-func websocketTest(c *websocket.Conn) {
-	// c.Locals are added to the *websocket.Conn
-	log.Println(c.Locals("allowed"))  // true
-	log.Println(c.Params("id"))       // 123
-	log.Println(c.Query("v"))         // 1.0
-	log.Println(c.Cookies("session")) // ""
-
-	// websocket.Conn bindings https://pkg.go.dev/github.com/fasthttp/websocket?tab=doc#pkg-index
-	var (
-		mt  int
-		msg []byte
-		err error
-	)
-	welcomeMessage := []byte("Client Connected")
-	if err = c.WriteMessage(websocket.TextMessage, welcomeMessage); err != nil {
-		log.Println("write:", err)
-		return
-	}
-
-	for {
-		if mt, msg, err = c.ReadMessage(); err != nil {
-			log.Println("read:", err)
-			break
-		}
-		log.Printf("recv: %s", msg)
-
-		serverMsg := "Server: " + string(msg)
-		if err = c.WriteMessage(mt, []byte(serverMsg)); err != nil {
-			log.Println("write:", err)
-			break
-		}
-	}
-
-}
 func (a *App) setupDB() {
 	client, err := mongo.Connect(options.Client().ApplyURI("mongodb://admin:yourpassword@localhost:27017"))
 	if err != nil {
@@ -68,11 +36,11 @@ func (a *App) setupDB() {
 	}
 
 	// Defer closing the database connection
-	defer func() {
-		if err := client.Disconnect(context.Background()); err != nil {
-			log.Printf("Error disconnecting from MongoDB: %v", err)
-		}
-	}()
+	//defer func() {
+	//	if err := client.Disconnect(context.Background()); err != nil {
+	//		log.Printf("Error disconnecting from MongoDB: %v", err)
+	//	}
+	//}()
 
 	a.database = client.Database("quiz")
 }
@@ -81,17 +49,24 @@ func (a *App) setupHttp() {
 	app := fiber.New()
 	app.Use(cors.New())
 
-	quizController := controller.NewQuizController(a.quizService)
-
 	app.Get("/", a.index)
-	app.Get("/api/getquizzes", quizController.GetQuizzes)
-	app.Get("/ws", websocket.New(websocketTest))
 
-	log.Fatal(app.Listen(":3000"))
+	quizController := controller.NewQuizController(a.quizService)
+	app.Get("/api/getquizzes", quizController.GetQuizzes)
+
+	wsController := controller.NewWsController()
+	app.Get("/ws", websocket.New(wsController.InitWebSocket))
+
+	err := app.Listen(":3000")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	a.httpServer = app
 }
 
 func (a *App) setupServices() {
-	a.quizService = service.NewQuizService(collection.NewQuizCollection(a.database.Collection("quiz")))
+	a.quizService = service.NewQuizService(collection.NewQuizCollection(a.database.Collection("quizzes")))
 }
 
 func (a *App) index(c *fiber.Ctx) error {
