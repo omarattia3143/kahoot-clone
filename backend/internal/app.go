@@ -30,7 +30,7 @@ func (a *App) Init() {
 }
 
 func (a *App) setupDB() {
-	client, err := mongo.Connect(options.Client().ApplyURI("mongodb://admin:yourpassword@localhost:27017"))
+	client, err := mongo.Connect(options.Client().ApplyURI("mongodb://adminuser:supersecurepassword@localhost:27017"))
 	if err != nil {
 		log.Fatal("can not connect to database")
 	}
@@ -42,7 +42,7 @@ func (a *App) setupDB() {
 	//	}
 	//}()
 
-	a.database = client.Database("quiz")
+	a.database = client.Database("kahoot_db")
 }
 
 func (a *App) setupHttp() {

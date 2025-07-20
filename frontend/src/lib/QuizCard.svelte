@@ -1,7 +1,12 @@
 <script lang="ts">
-    export let quiz: {_id: string, name: string}
+    import type {Quiz} from "../models/models";
+    import Button from "./Button.svelte";
+
+    export let quiz: Quiz;
+    export let host: () => void;
 </script>
 
-<div class="bg-white rounded p-4 border-2 m-2 border-green-500">
-    {quiz.name}
+<div class="flex justify-between bg-white rounded p-4 items-center border-2 m-2 border-green-500">
+    <p>{quiz.name}</p>
+    <Button on:click={host}>Host</Button>
 </div>

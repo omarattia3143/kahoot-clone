@@ -1,13 +1,14 @@
 <script lang="ts">
   import QuizCard from "./QuizCard.svelte";
   import Button from "./Button.svelte";
+  import type {Quiz} from "../models/models";
 
-  let quizzes: { _id: string; name: string }[] = [];
+  let quizzes: Quiz[] = [];
 
   async function getQuizzes() {
     const response = await fetch("http://localhost:3000/api/getquizzes");
     if (!response.ok) {
-      alert("error: " + response.text);
+      alert("error: " + await response.text());
       return;
     }
     quizzes = await response.json();
@@ -23,13 +24,20 @@
       console.log(event.data);
     };
   }
+
+  function hostQuiz(quiz: Quiz) {
+    console.log("hosting: ", quiz)
+  }
+
+  getQuizzes()
 </script>
 
-<div>
+<div class="p-4">
   <Button on:click={getQuizzes}>Get Quizzes</Button>
   <Button on:click={webSocketConnect}>Connect</Button>
 </div>
 
+
 {#each quizzes as quiz}
-  <QuizCard {quiz}/>
+  <QuizCard host={() => hostQuiz(quiz)} {quiz}/>
 {/each}

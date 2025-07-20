@@ -3,7 +3,6 @@ package collection
 import (
 	"context"
 	"github.com/omarattia3143/quiz/internal/entity"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
@@ -23,7 +22,7 @@ func (c QuizCollection) InsertQuiz(quiz entity.Quiz) error {
 	return err
 }
 
-func (c QuizCollection) GetQuizById(id primitive.ObjectID) (*entity.Quiz, error) {
+func (c QuizCollection) GetQuizById(id bson.ObjectID) (*entity.Quiz, error) {
 	quiz := entity.Quiz{}
 	result := c.collection.FindOne(context.Background(), bson.M{"_id": id})
 	err := result.Decode(&quiz)
