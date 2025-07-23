@@ -8,5 +8,5 @@
 
 <div class="flex justify-between bg-white rounded p-4 items-center border-2 m-2 border-green-500">
     <p>{quiz.name}</p>
-    <Button on:click={host}>Host</Button>
+    <Button onclick={host}>Host</Button>
 </div>

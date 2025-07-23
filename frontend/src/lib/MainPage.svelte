@@ -28,15 +28,17 @@
   function hostQuiz(quiz: Quiz) {
     console.log("hosting: ", quiz)
   }
-
-  getQuizzes()
 </script>
 
 <div class="p-4">
-  <Button on:click={getQuizzes}>Get Quizzes</Button>
-  <Button on:click={webSocketConnect}>Connect</Button>
+  <Button onclick={getQuizzes}>Get Quizzes</Button>
+<!--  <Button on:click={webSocketConnect}>Connect</Button>-->
 </div>
 
+<div class="flex p-4">
+  <input class="border p-1" type="text" placeholder="Game Code">
+  <Button class="ml-4" >Join</Button>
+</div>
 
 {#each quizzes as quiz}
   <QuizCard host={() => hostQuiz(quiz)} {quiz}/>
