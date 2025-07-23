@@ -2,14 +2,16 @@ package controller
 
 import (
 	"github.com/gofiber/contrib/websocket"
+	"github.com/omarattia3143/quiz/internal/service"
 	"log"
 )
 
 type WsController struct {
+	netService *service.NetService
 }
 
-func NewWsController() *WsController {
-	return &WsController{}
+func NewWsController(netService *service.NetService) *WsController {
+	return &WsController{netService: netService}
 }
 
 func (w *WsController) InitWebSocket(c *websocket.Conn) {

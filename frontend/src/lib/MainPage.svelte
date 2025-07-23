@@ -15,24 +15,19 @@
     console.log(quizzes);
   }
 
-  function webSocketConnect() {
+  function hostQuiz(quiz: Quiz) {
     const ws = new WebSocket("ws://localhost:3000/ws");
     ws.onopen = () => {
-      ws.send("Hello");
+      ws.send(`host: ${quiz.id}`);
     };
     ws.onmessage = (event) => {
       console.log(event.data);
     };
   }
-
-  function hostQuiz(quiz: Quiz) {
-    console.log("hosting: ", quiz)
-  }
 </script>
 
 <div class="p-4">
   <Button onclick={getQuizzes}>Get Quizzes</Button>
-<!--  <Button on:click={webSocketConnect}>Connect</Button>-->
 </div>
 
 <div class="flex p-4">

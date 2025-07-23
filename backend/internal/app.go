@@ -20,6 +20,7 @@ type App struct {
 	database   *mongo.Database
 
 	quizService *service.QuizService
+	netService  *service.NetService
 }
 
 func (a *App) Init() {
@@ -35,13 +36,6 @@ func (a *App) setupDB() {
 		log.Fatal("can not connect to database")
 	}
 
-	// Defer closing the database connection
-	//defer func() {
-	//	if err := client.Disconnect(context.Background()); err != nil {
-	//		log.Printf("Error disconnecting from MongoDB: %v", err)
-	//	}
-	//}()
-
 	a.database = client.Database("kahoot_db")
 }
 
@@ -54,7 +48,7 @@ func (a *App) setupHttp() {
 	quizController := controller.NewQuizController(a.quizService)
 	app.Get("/api/getquizzes", quizController.GetQuizzes)
 
-	wsController := controller.NewWsController()
+	wsController := controller.NewWsController(a.netService)
 	app.Get("/ws", websocket.New(wsController.InitWebSocket))
 
 	err := app.Listen(":3000")
@@ -67,6 +61,7 @@ func (a *App) setupHttp() {
 
 func (a *App) setupServices() {
 	a.quizService = service.NewQuizService(collection.NewQuizCollection(a.database.Collection("quizzes")))
+	a.netService = service.NewNetService(a.quizService)
 }
 
 func (a *App) index(c *fiber.Ctx) error {
