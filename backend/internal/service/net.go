@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gofiber/contrib/websocket"
 	"strings"
@@ -52,4 +53,21 @@ func (c *NetService) OnIncomingMessage(con *websocket.Conn, mt int, msg []byte) 
 			break
 		}
 	}
+}
+func (c *NetService) PacketToBytes(packet any) ([]byte, error) {
+	var packetId uint = 0
+	bytes, err := json.Marshal(packet)
+	if err != nil {
+		return nil, err
+	}
+	final := append([]byte{byte(packetId)}, bytes...)
+	return final, nil
+}
+
+func (c *NetService) SendPacket(connection *websocket.Conn, packet any) error {
+	bytes, err := c.PacketToBytes(packet)
+	if err != nil {
+		return err
+	}
+	return connection.WriteMessage(websocket.BinaryMessage, bytes)
 }

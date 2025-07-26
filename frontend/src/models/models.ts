@@ -4,6 +4,11 @@ export interface Quiz {
     questions: QuizQuestion[];
 }
 
+export interface Player {
+    id: string;
+    name: string;
+}
+
 export interface QuizQuestion {
     id: string;
     name: string;
