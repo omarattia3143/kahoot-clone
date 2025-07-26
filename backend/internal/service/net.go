@@ -20,7 +20,7 @@ func NewNetService(quizService *QuizService) *NetService {
 }
 func (c *NetService) OnIncomingMessage(con *websocket.Conn, mt int, msg []byte) {
 	str := string(msg)
-	parts := strings.Split(":", str)
+	parts := strings.Split(str, ":")
 	cmd := parts[0]
 	argument := parts[1]
 
@@ -31,12 +31,14 @@ func (c *NetService) OnIncomingMessage(con *websocket.Conn, mt int, msg []byte) 
 			c.host = con
 			c.tick = 100
 			go func() {
-				c.tick--
-				err := c.host.WriteMessage(mt, []byte(fmt.Sprintf("tick: %d", c.tick)))
-				if err != nil {
-					fmt.Println("error sending tick")
+				for {
+					c.tick--
+					err := c.host.WriteMessage(mt, []byte(fmt.Sprintf("tick: %d", c.tick)))
+					if err != nil {
+						fmt.Println("error sending tick")
+					}
+					time.Sleep(time.Second)
 				}
-				time.Sleep(time.Second)
 			}()
 			break
 		}

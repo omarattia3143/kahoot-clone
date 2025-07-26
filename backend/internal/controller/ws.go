@@ -40,9 +40,6 @@ func (w *WsController) InitWebSocket(c *websocket.Conn) {
 		}
 		log.Printf("recv: %s", msg)
 
-		if err = c.WriteMessage(mt, []byte(msg)); err != nil {
-			log.Println("write:", err)
-			break
-		}
+		w.netService.OnIncomingMessage(c, mt, msg)
 	}
 }
